@@ -27,6 +27,10 @@ LOG_MODULE_REGISTER(cb_info, CONFIG_LOG_DEFAULT_LEVEL);
 #define CONFIG_SOC "unknown"
 #endif
 
+#ifndef CB_INFO_BUILD_TIMEZONE
+#define CB_INFO_BUILD_TIMEZONE "unknown"
+#endif
+
 static const char *const separator_line =
     "--------------------------------------------------------------------";
 
@@ -127,7 +131,10 @@ const char *const *cb_info_get_device_info(size_t *count)
     (void)snprintf(zephyr_line, sizeof(zephyr_line),
                "  Zephyr release:      %s", KERNEL_VERSION_STRING);
     (void)snprintf(build_date_line, sizeof(build_date_line),
-               "  Build date:          %s %s", __DATE__, __TIME__);
+               "  Build date:          %s %s %s",
+               __DATE__,
+               __TIME__,
+               CB_INFO_BUILD_TIMEZONE);
     (void)snprintf(build_host_line, sizeof(build_host_line),
                "  Build host:          %s", CB_INFO_BUILD_HOSTNAME);
     (void)snprintf(board_line, sizeof(board_line),
@@ -165,7 +172,7 @@ const char *const *cb_info_get_device_info(size_t *count)
 
 
 
-void cb_info_log(void)
+void cb_info(void)
 {
     // info content to log channel
     size_t count;

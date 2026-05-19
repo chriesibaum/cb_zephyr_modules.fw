@@ -1,0 +1,17 @@
+manifest:
+
+  remotes:
+    - name: zephyrproject-rtos
+      url-base: https://github.com/zephyrproject-rtos
+
+  defaults:
+    remote: zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      revision: v4.4.0
+      path: upstream/zephyr
+      import: true
+
+  self:
+    path: cb_zephyr_modules.fw

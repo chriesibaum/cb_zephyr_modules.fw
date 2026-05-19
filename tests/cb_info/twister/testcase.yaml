@@ -1,0 +1,18 @@
+tests:
+  cb_info.api.native_sim:
+    tags:
+      - cb_info
+      - smoke
+    harness: ztest
+    platform_allow:
+      - native_sim
+    integration_platforms:
+      - native_sim
+
+  cb_info.api.nucleo_u385rg_q:
+    tags:
+      - cb_info
+      - smoke
+    harness: ztest
+    platform_allow:
+      - nucleo_u385rg_q

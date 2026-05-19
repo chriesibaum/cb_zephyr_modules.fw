@@ -1,0 +1,14 @@
+/ {
+	aliases {
+		sys-led = &green_led_2;
+		sys-led-pwm = &green_pwm_led;
+	};
+
+	pwmleds: pwmleds {
+		status = "okay";
+	};
+};
+
+&pwm2 {
+	status = "okay";
+};

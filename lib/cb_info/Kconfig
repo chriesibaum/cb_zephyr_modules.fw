@@ -3,5 +3,6 @@
 
 config CB_INFO
 	bool "Enable cb_zephyr_module info library"
+	select HWINFO
 	help
 	  Enable the cb_info library provided by cb_zephyr_module.

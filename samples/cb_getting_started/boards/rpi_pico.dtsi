@@ -1,0 +1,15 @@
+/ {
+	aliases {
+        sys-led = &led0;
+		sys-led-pwm = &pwm_led0;
+	};
+
+	pwm_leds {
+		compatible = "pwm-leds";
+		status = "okay";
+	};
+};
+
+&pwm {
+	status = "okay";
+};

@@ -1,0 +1,4 @@
+#include "rpi_pico.dtsi"
+
+#warning "rpi_pico2_rp2350a_hazard3.overlay is not ready yet: no LEDs are configured"
+#error "Build blocked: configure LED aliases/nodes for this board overlay"

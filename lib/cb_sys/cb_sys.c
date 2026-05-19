@@ -23,11 +23,12 @@ LOG_MODULE_REGISTER(CB_SYS, CONFIG_LOG_DEFAULT_LEVEL);
 #define LED_SYS_NODE DT_ALIAS(sys_led)
 #define LED_SYS_PWM_NODE DT_ALIAS(sys_led_pwm)
 
-#define LED_TOGGLE_PERIOD_MS 1000   // Toggle period in milliseconds
 #define LED_BLINK_DURATION_MS  50   // LED on duration in milliseconds
+#define LED_BLINK_PERIOD_MS \
+    MAX(1U, (60000U + (CONFIG_CB_SYS_LED_BPM / 2U)) / CONFIG_CB_SYS_LED_BPM)
 
 
-#if DT_NODE_HAS_STATUS(LED_SYS_PWM_NODE, okay)
+#if defined(CONFIG_CB_SYS_LED_HEARTBEAT) && DT_NODE_HAS_STATUS(LED_SYS_PWM_NODE, okay)
 static const struct pwm_dt_spec led_sys_pwm = PWM_DT_SPEC_GET(LED_SYS_PWM_NODE);
 
 static const uint8_t led_heartbeat_pattern_keyframes_pct[] = {
@@ -39,8 +40,8 @@ static const uint8_t led_heartbeat_pattern_keyframes_pct[] = {
 #define LED_HEARTBEAT_KEYFRAME_COUNT ARRAY_SIZE(led_heartbeat_pattern_keyframes_pct)
 #define LED_HEARTBEAT_STEP_COUNT (LED_HEARTBEAT_KEYFRAME_COUNT * LED_HEARTBEAT_INTERP_STEPS)
 #define LED_HEARTBEAT_STEP_PERIOD_MS \
-    MAX(1U, (60000U + ((CONFIG_CB_SYS_LED_HEARTBEAT_BPM * LED_HEARTBEAT_STEP_COUNT) / 2U)) / \
-            (CONFIG_CB_SYS_LED_HEARTBEAT_BPM * LED_HEARTBEAT_STEP_COUNT))
+    MAX(1U, (60000U + ((CONFIG_CB_SYS_LED_BPM * LED_HEARTBEAT_STEP_COUNT) / 2U)) / \
+            (CONFIG_CB_SYS_LED_BPM * LED_HEARTBEAT_STEP_COUNT))
 
 static uint8_t led_heartbeat_idx;
 
@@ -83,7 +84,7 @@ static void sys_led_pwm_timer_handler(struct k_timer *timer)
     }
 }
 
-#elif DT_NODE_HAS_STATUS(LED_SYS_NODE, okay)
+#elif defined(CONFIG_CB_SYS_LED_BLINK) && DT_NODE_HAS_STATUS(LED_SYS_NODE, okay)
 static const struct gpio_dt_spec led_sys = GPIO_DT_SPEC_GET(LED_SYS_NODE, gpios);
 
 // cb sys led timer
@@ -107,7 +108,7 @@ static void cb_sys_led_timer_off_handler(struct k_timer *timer)
 
 int32_t cb_sys_init(void)
 {
-#if DT_NODE_HAS_STATUS(LED_SYS_PWM_NODE, okay)
+#if defined(CONFIG_CB_SYS_LED_HEARTBEAT) && DT_NODE_HAS_STATUS(LED_SYS_PWM_NODE, okay)
     int32_t ret;
 
     ERR_CHECK(!pwm_is_ready_dt(&led_sys_pwm), -ENODEV, "sys-led-pwm not ready");
@@ -122,14 +123,14 @@ int32_t cb_sys_init(void)
                   K_MSEC(LED_HEARTBEAT_STEP_PERIOD_MS));
     return 0;
 
-#elif DT_NODE_HAS_STATUS(LED_SYS_NODE, okay)
+#elif defined(CONFIG_CB_SYS_LED_BLINK) && DT_NODE_HAS_STATUS(LED_SYS_NODE, okay)
     ERR_CHECK(!gpio_is_ready_dt(&led_sys), -ENODEV, "sys-led GPIO not ready");
 
     int32_t ret = gpio_pin_configure_dt(&led_sys, GPIO_OUTPUT_INACTIVE);
     ERR_CHECK(ret < 0, ret, "Failed to configure sys-led GPIO (%d)", ret);
 
-    /* Start the timer to toggle LED every LED_TOGGLE_PERIOD_MS */
-    k_timer_start(&cb_sys_led_timer, K_MSEC(LED_TOGGLE_PERIOD_MS), K_MSEC(LED_TOGGLE_PERIOD_MS));
+    /* Start periodic blink timer derived from configured BPM. */
+    k_timer_start(&cb_sys_led_timer, K_MSEC(LED_BLINK_PERIOD_MS), K_MSEC(LED_BLINK_PERIOD_MS));
 
     return 0;
 

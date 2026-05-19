@@ -1,0 +1,11 @@
+# Twister hardware map for running tests on real hardware.
+# Update serial and id to match your connected board/debug probe.
+
+- connected: true
+  platform: nucleo_u385rg_q
+  product: NUCLEO-U385RG-Q
+  runner: pyocd
+  serial: /dev/ttyACM0
+  baud: 115200
+  id: 002500383333511531363730    # STLINK-V3 from nucleo_u385rg_q (use `pyocd list` to find the correct id for your board)
+  flash_timeout: 180

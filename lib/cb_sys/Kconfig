@@ -6,10 +6,32 @@ config CB_SYS
 	help
 	  Enable the sys utility library provided by cb_zephyr_module.
 
-config CB_SYS_LED_HEARTBEAT_BPM
-	int "System LED heartbeat BPM"
-	range 20 240
-	default 60
+config CB_SYS_LED_BLINK
+	bool "Enable system LED blink mode"
+	default y
 	depends on CB_SYS
 	help
-	  Heartbeat cycles per minute for the system PWM LED mode.
+	  Enable simple periodic blink mode using the sys_led GPIO alias.
+
+config CB_SYS_LED_HEARTBEAT
+	bool "Enable system LED heartbeat mode"
+	default n
+	depends on CB_SYS
+	select PWM
+	help
+	  Enable heartbeat PWM LED mode using the sys_led_pwm alias.
+
+config CB_SYS_LED_BPM
+	int "System LED BPM"
+	range 20 240
+	default CB_SYS_LED_HEARTBEAT_BPM
+	depends on CB_SYS && (CB_SYS_LED_HEARTBEAT || CB_SYS_LED_BLINK)
+	help
+	  Cycles per minute for system LED timing in heartbeat and blink modes.
+
+config CB_SYS_LED_HEARTBEAT_BPM
+	int
+	default 60
+	depends on CB_SYS && (CB_SYS_LED_HEARTBEAT || CB_SYS_LED_BLINK)
+	help
+	  Deprecated compatibility symbol. Use CB_SYS_LED_BPM.

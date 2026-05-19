@@ -23,7 +23,7 @@ const char *const *cb_info_get_device_info(size_t *count);
 /**
  * @brief Print build, system and version info via logging.
  */
-void cb_info_log(void);
+void cb_info(void);
 
 #ifdef __cplusplus
 }
